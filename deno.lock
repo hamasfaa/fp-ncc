@@ -8,6 +8,7 @@
     "jsr:@std/bytes@1": "1.0.5",
     "jsr:@std/crypto@1": "1.0.4",
     "jsr:@std/dotenv@~0.225.3": "0.225.3",
+    "jsr:@std/encoding@0.224.0": "0.224.0",
     "jsr:@std/encoding@1": "1.0.10",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
     "jsr:@std/fs@^1.0.17": "1.0.17",
@@ -16,7 +17,9 @@
     "jsr:@std/path@1": "1.0.9",
     "jsr:@std/path@^1.0.9": "1.0.9",
     "jsr:@supabase/supabase-js@2": "2.49.4",
+    "jsr:@supabase/supabase-js@^2.49.4": "2.49.4",
     "jsr:@tajpouria/cors@^1.2.1": "1.2.1",
+    "jsr:@zaubrik/djwt@^3.0.2": "3.0.2",
     "npm:@supabase/auth-js@2.69.1": "2.69.1",
     "npm:@supabase/functions-js@2.4.4": "2.4.4",
     "npm:@supabase/node-fetch@2.6.15": "2.6.15",
@@ -61,6 +64,9 @@
     "@std/dotenv@0.225.3": {
       "integrity": "a95e5b812c27b0854c52acbae215856d9cce9d4bbf774d938c51d212711e8d4a"
     },
+    "@std/encoding@0.224.0": {
+      "integrity": "efb6dca97d3e9c31392bd5c8cfd9f9fc9decf5a1f4d1f78af7900a493bcf89b5"
+    },
     "@std/encoding@1.0.10": {
       "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
     },
@@ -95,6 +101,12 @@
     },
     "@tajpouria/cors@1.2.1": {
       "integrity": "eca42e4fb7cb3906ef0ee3d1e565dd6bb4632ccd8e70a95cf4279759743328f0"
+    },
+    "@zaubrik/djwt@3.0.2": {
+      "integrity": "8070adaa49cd9e5d2b8ae82fd461132c966ef2f8ff8378db4a4da8df4f17c664",
+      "dependencies": [
+        "jsr:@std/encoding@0.224.0"
+      ]
     }
   },
   "npm": {
@@ -472,7 +484,8 @@
       "jsr:@std/dotenv@~0.225.3",
       "jsr:@std/fs@^1.0.17",
       "jsr:@supabase/supabase-js@^2.49.4",
-      "jsr:@tajpouria/cors@^1.2.1"
+      "jsr:@tajpouria/cors@^1.2.1",
+      "jsr:@zaubrik/djwt@^3.0.2"
     ]
   }
 }
