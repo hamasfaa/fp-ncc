@@ -1,6 +1,14 @@
 import { supabase } from "../utils/db.ts";
-import { createUser } from "../models/user.model.ts";
-import { UserRegistration, AuthResponse } from "../types/auth.type.ts";
+import {
+  createUser,
+  getUserById,
+  updateUserStatus,
+} from "../models/user.model.ts";
+import {
+  UserRegistration,
+  AuthResponse,
+  UserCredentials,
+} from "../types/auth.type.ts";
 
 export async function registerUser(
   userData: UserRegistration
@@ -25,5 +33,52 @@ export async function registerUser(
       token: null,
       error: error.message,
     };
+  }
+}
+
+export async function loginUser(
+  credentials: UserCredentials
+): Promise<AuthResponse> {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: credentials.email,
+      password: credentials.password,
+    });
+
+    if (error) throw new Error(error.message);
+
+    const userId = data.user?.id;
+    if (!userId) throw new Error("User ID not found");
+    const user = await getUserById(userId);
+    await updateUserStatus(userId, "online");
+
+    return {
+      user,
+      token: data.session?.access_token || null,
+    };
+  } catch (error) {
+    console.error("Login error:", error);
+    return {
+      user: null,
+      token: null,
+      error: error.message,
+    };
+  }
+}
+
+export async function logoutUser(
+  token: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const userId = payload.sub;
+    if (!userId) throw new Error("Invalid token");
+
+    await updateUserStatus(userId, "offline");
+    await supabase.auth.signOut();
+    return { success: true };
+  } catch (error) {
+    console.error("Logout error:", error);
+    return { success: false, error: error.message };
   }
 }
