@@ -30,3 +30,51 @@ export async function createUser(userData: UserRegistration): Promise<User> {
     return handleDbError(error);
   }
 }
+
+export async function getUserById(userId: string): Promise<User | null> {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (error) {
+    console.error("Error in getUserById:", error);
+    return null;
+  }
+}
+
+export async function searchUsers(query: string): Promise<User[]> {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .ilike("username", `%${query}%`)
+      .limit(20);
+
+    if (error) throw new Error(error.message);
+    return data || [];
+  } catch (error) {
+    console.error("Error in searchUsers:", error);
+    return [];
+  }
+}
+
+export async function updateUserStatus(
+  userId: string,
+  status: string
+): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from("users")
+      .update({ status, last_seen: new Date().toISOString() })
+      .eq("id", userId);
+
+    if (error) throw new Error(error.message);
+  } catch (error) {
+    console.error("Error in updateUserStatus:", error);
+  }
+}
