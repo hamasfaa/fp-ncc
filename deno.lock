@@ -1,6 +1,7 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@117/mutex@*": "1.0.8",
     "jsr:@oak/commons@1": "1.0.1",
     "jsr:@oak/oak@*": "17.1.4",
     "jsr:@oak/oak@^17.1.4": "17.1.4",
@@ -26,9 +27,13 @@
     "npm:@supabase/postgrest-js@1.19.4": "1.19.4",
     "npm:@supabase/realtime-js@2.11.2": "2.11.2",
     "npm:@supabase/storage-js@2.7.1": "2.7.1",
-    "npm:path-to-regexp@^6.3.0": "6.3.0"
+    "npm:path-to-regexp@^6.3.0": "6.3.0",
+    "npm:simple-mutex@1": "1.0.0"
   },
   "jsr": {
+    "@117/mutex@1.0.8": {
+      "integrity": "8f14ef3e124ae427c92f93951fbe36b5cfad3aa74f84d443b2acf3034683255d"
+    },
     "@oak/commons@1.0.1": {
       "integrity": "889ff210f0b4292591721be07244ecb1b5c118742f5273c70cf30d7cd4184d0c",
       "dependencies": [
@@ -166,6 +171,9 @@
     },
     "path-to-regexp@6.3.0": {
       "integrity": "sha512-Yhpw4T9C6hPpgPeA28us07OJeqZ5EzQTkbfwuhsUg0c237RomFoETJgmp2sa3F/41gfLE6G5cqcYwznmeEeOlQ=="
+    },
+    "simple-mutex@1.0.0": {
+      "integrity": "sha512-Z1Md+jmaomMmlIuwfGOyzVo6NWRBlGFzovQhvTdQk06+qVqOhZYG0suPR91HGlxueaCpn4mTdQq5yDTSyv5WpA=="
     },
     "tr46@0.0.3": {
       "integrity": "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw=="
@@ -485,7 +493,8 @@
       "jsr:@std/fs@^1.0.17",
       "jsr:@supabase/supabase-js@^2.49.4",
       "jsr:@tajpouria/cors@^1.2.1",
-      "jsr:@zaubrik/djwt@^3.0.2"
+      "jsr:@zaubrik/djwt@^3.0.2",
+      "npm:simple-mutex@1"
     ]
   }
 }

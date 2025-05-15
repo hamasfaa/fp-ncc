@@ -1,6 +1,9 @@
 import { Application, oakCors, ensureDir } from "./deps.ts";
 import { errorMiddleware } from "./middleware/error.middleware.ts";
 import authRoutes from "./routes/auth.routes.ts";
+import wsRoutes from "./routes/ws.routes.ts";
+import chatRoutes from "./routes/chat.routes.ts";
+
 import config from "./config/config.ts";
 
 await ensureDir(config.fileStorage.uploadDir);
@@ -20,6 +23,12 @@ app.use(errorMiddleware);
 
 app.use(authRoutes.routes());
 app.use(authRoutes.allowedMethods());
+
+app.use(wsRoutes.routes());
+app.use(wsRoutes.allowedMethods());
+
+app.use(chatRoutes.routes());
+app.use(chatRoutes.allowedMethods());
 
 app.use((ctx) => {
   ctx.response.status = 404;

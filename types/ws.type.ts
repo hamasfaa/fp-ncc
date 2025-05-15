@@ -18,6 +18,7 @@ export interface WsMessage {
   conversation_id: string;
   sender_id: string;
   timestamp: number;
+  sender: {};
 }
 
 export interface WsError {

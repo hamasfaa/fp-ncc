@@ -1,7 +1,14 @@
 import { createClient } from "../deps.ts";
 import config from "../config/config.ts";
 
-export const supabase = createClient(config.supabase.url, config.supabase.key);
+// export const supabase = createClient(config.supabase.url, config.supabase.key);
+export const supabase = createClient(
+  config.supabase.url,
+  config.supabase.serviceKey,
+  {
+    auth: { persistSession: false },
+  }
+);
 export const supabaseAdmin = createClient(
   config.supabase.url,
   config.supabase.serviceKey,

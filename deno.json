@@ -9,6 +9,7 @@
     "@std/fs": "jsr:@std/fs@^1.0.17",
     "@supabase/supabase-js": "jsr:@supabase/supabase-js@^2.49.4",
     "@tajpouria/cors": "jsr:@tajpouria/cors@^1.2.1",
-    "@zaubrik/djwt": "jsr:@zaubrik/djwt@^3.0.2"
+    "@zaubrik/djwt": "jsr:@zaubrik/djwt@^3.0.2",
+    "simple-mutex": "npm:simple-mutex@^1.0.0"
   }
 }

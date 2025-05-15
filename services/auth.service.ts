@@ -9,12 +9,21 @@ import {
   AuthResponse,
   UserCredentials,
 } from "../types/auth.type.ts";
+import {
+  addUserToGlobalChat,
+  sendGlobalChatWelcomeMessage,
+} from "./globalChat.service.ts";
+import { wsManager } from "../utils/wsManager.ts";
 
 export async function registerUser(
   userData: UserRegistration
 ): Promise<AuthResponse> {
   try {
     const user = await createUser(userData);
+
+    await addUserToGlobalChat(user.id);
+    await sendGlobalChatWelcomeMessage(user.username);
+
     const { data: authData, error } = await supabase.auth.signInWithPassword({
       email: userData.email,
       password: userData.password,
@@ -50,7 +59,7 @@ export async function loginUser(
     const userId = data.user?.id;
     if (!userId) throw new Error("User ID not found");
     const user = await getUserById(userId);
-    await updateUserStatus(userId, "online");
+    // await updateUserStatus(userId, "online");
 
     return {
       user,
@@ -74,7 +83,7 @@ export async function logoutUser(
     const userId = payload.sub;
     if (!userId) throw new Error("Invalid token");
 
-    await updateUserStatus(userId, "offline");
+    // await updateUserStatus(userId, "offline");
     await supabase.auth.signOut();
     return { success: true };
   } catch (error) {
