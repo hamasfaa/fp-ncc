@@ -6,17 +6,9 @@ import { supabase } from "./db.ts";
 class WebSocketManager {
   private connections: Map<string, WsConnection> = new Map();
   private userConnections: Map<string, Set<string>> = new Map();
-  private static instance: WebSocketManager;
 
-  private constructor() {
+  constructor() {
     console.log("WebSocket Manager initialized");
-  }
-
-  public static getInstance(): WebSocketManager {
-    if (!WebSocketManager.instance) {
-      WebSocketManager.instance = new WebSocketManager();
-    }
-    return WebSocketManager.instance;
   }
 
   async validateToken(token: string): Promise<{ userId: string } | null> {
@@ -85,14 +77,6 @@ class WebSocketManager {
         );
         this.removeConnection(connectionId);
       };
-
-      socket.send(
-        JSON.stringify({
-          type: "connection_established",
-          userId: userId,
-          timestamp: Date.now(),
-        })
-      );
 
       return connection;
     } catch (error) {
@@ -188,23 +172,13 @@ class WebSocketManager {
 
       if (error) throw new Error(error.message);
 
-      console.log(
-        `Found ${
-          members?.length || 0
-        } members in conversation ${conversationId}`
-      );
-
-      let sentCount = 0;
-
-      if (members) {
-        for (const member of members) {
-          const userId = member.user_id;
-          if (userId !== message.sender_id) {
-            try {
-              this.sendToUser(userId, withMetadataMessage);
-            } catch (err) {
-              console.error(`Failed to send message to user ${userId}: ${err}`);
-            }
+      for (const member of members) {
+        const userId = member.user_id;
+        if (userId !== message.sender_id) {
+          try {
+            this.sendToUser(userId, withMetadataMessage);
+          } catch (err) {
+            console.error(`Failed to send message to user ${userId}: ${err}`);
           }
         }
       }
@@ -213,7 +187,7 @@ class WebSocketManager {
     }
   }
 
-  broadcast(message: WsMessage): void {
+  async broadcast(message: WsMessage): Promise<void> {
     console.log(
       `Broadcasting message to all ${this.connections.size} connections`
     );
@@ -225,4 +199,4 @@ class WebSocketManager {
   }
 }
 
-export const wsManager = WebSocketManager.getInstance();
+export const wsManager = new WebSocketManager();

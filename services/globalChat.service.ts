@@ -89,7 +89,6 @@ export async function addUserToGlobalChat(userId: string): Promise<void> {
       .eq("conversation_id", globalChatId)
       .eq("user_id", userId);
 
-    console.log(`User ${userId} membership count: ${count}`);
     if (countError) {
       throw new Error(
         `Error checking global chat membership: ${countError.message}`

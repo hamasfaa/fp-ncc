@@ -71,7 +71,6 @@ export async function markAsRead(userId: string, messageId: string) {
     .single();
 
   if (message) {
-    // Broadcast read receipt
     await wsManager.sendToConversation(message.conversation_id, {
       type: MessageType.READ_RECEIPT,
       data: {
@@ -85,6 +84,7 @@ export async function markAsRead(userId: string, messageId: string) {
       sender: {},
     });
   }
+  return { success: true };
 }
 
 export async function getReadStatus(messageId: string) {

@@ -79,11 +79,6 @@ export async function logoutUser(
   token: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    const userId = payload.sub;
-    if (!userId) throw new Error("Invalid token");
-
-    // await updateUserStatus(userId, "offline");
     await supabase.auth.signOut();
     return { success: true };
   } catch (error) {

@@ -8,36 +8,6 @@ export async function sendMessage(
   content: string
 ): Promise<Message> {
   try {
-    // Log the exact IDs being used in the query
-    console.log("Checking membership with exact IDs:");
-    console.log(`User ID: "${senderId}" (${senderId.length} characters)`);
-    console.log(
-      `Conversation ID: "${conversationId}" (${conversationId.length} characters)`
-    );
-
-    // First, try to directly retrieve the membership record
-    const { data: membershipData, error: fetchError } = await supabase
-      .from("conversation_members")
-      .select("*")
-      .eq("conversation_id", conversationId)
-      .eq("user_id", senderId);
-
-    if (fetchError) {
-      console.error("Error fetching membership:", fetchError);
-      throw new Error(fetchError.message);
-    }
-
-    console.log(
-      "Membership records found:",
-      membershipData ? membershipData.length : 0
-    );
-    if (membershipData) {
-      membershipData.forEach((record) => {
-        console.log("Record:", JSON.stringify(record));
-      });
-    }
-
-    // Then get the count for the check
     const { count, error: memberError } = await supabase
       .from("conversation_members")
       .select("*", { count: "exact", head: true })
@@ -48,31 +18,9 @@ export async function sendMessage(
       console.error("Error counting membership:", memberError);
       throw new Error(memberError.message);
     }
-
-    console.log(`Membership count: ${count}`);
-
-    if (count === 0) {
-      // If not found, try a broader search and log results
-      console.log("Member not found, trying broader search...");
-
-      const { data: allMembers } = await supabase
-        .from("conversation_members")
-        .select("user_id, conversation_id")
-        .eq("conversation_id", conversationId);
-
-      console.log("All members of this conversation:", allMembers);
-
-      const { data: userConversations } = await supabase
-        .from("conversation_members")
-        .select("conversation_id")
-        .eq("user_id", senderId);
-
-      console.log("All conversations for this user:", userConversations);
-
+    if (count === 0)
       throw new Error("User is not a member of this conversation");
-    }
 
-    // Rest of the function remains the same
     const { data: message, error } = await supabase
       .from("messages")
       .insert({

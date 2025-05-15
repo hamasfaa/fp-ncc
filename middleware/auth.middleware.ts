@@ -1,6 +1,5 @@
 import { Context, verify } from "../deps.ts";
 import config from "../config/config.ts";
-import { supabase } from "../utils/db.ts";
 
 const getKey = async (): Promise<CryptoKey> => {
   const encoder = new TextEncoder();
