@@ -22,8 +22,6 @@ export async function searchUsersCont(ctx: Context) {
   try {
     const query = ctx.request.url.searchParams.get("query") || "";
 
-    console.log("Search query:", query);
-
     if (query.length < 2) {
       ctx.response.status = 400;
       ctx.response.body = {
