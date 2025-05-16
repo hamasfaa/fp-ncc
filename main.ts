@@ -3,6 +3,7 @@ import { errorMiddleware } from "./middleware/error.middleware.ts";
 import authRoutes from "./routes/auth.routes.ts";
 import wsRoutes from "./routes/ws.routes.ts";
 import chatRoutes from "./routes/chat.routes.ts";
+import userRoutes from "./routes/user.routes.ts";
 
 import config from "./config/config.ts";
 
@@ -29,6 +30,9 @@ app.use(wsRoutes.allowedMethods());
 
 app.use(chatRoutes.routes());
 app.use(chatRoutes.allowedMethods());
+
+app.use(userRoutes.routes());
+app.use(userRoutes.allowedMethods());
 
 app.use((ctx) => {
   ctx.response.status = 404;
