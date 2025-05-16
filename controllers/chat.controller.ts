@@ -55,7 +55,7 @@ export async function getGlobalChat(ctx: Context) {
     await addUserToGlobalChat(userId);
     const globalChatId = await createGlobalChat();
 
-    const { data: chat, error } = await supabaseAdmin
+    const { data: chat, error } = await supabase
       .from("conversations")
       .select(
         `

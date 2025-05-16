@@ -6,7 +6,7 @@ import {
 
 export async function createGlobalChat(): Promise<string> {
   try {
-    const { data: existingChat, error: queryError } = await supabaseAdmin
+    const { data: existingChat, error: queryError } = await supabase
       .from("conversations")
       .select("id")
       .eq("id", "00000000-0000-0000-0000-000000000001")
@@ -29,7 +29,7 @@ export async function createGlobalChat(): Promise<string> {
     let systemUserId: string;
 
     if (systemUserError) {
-      const { data: newSystemUser, error: createError } = await supabaseAdmin
+      const { data: newSystemUser, error: createError } = await supabase
         .from("users")
         .insert({
           id: "00000000-0000-0000-0000-000000000000",
@@ -49,7 +49,7 @@ export async function createGlobalChat(): Promise<string> {
       systemUserId = systemUser.id;
     }
 
-    const { data: conversationData, error: insertError } = await supabaseAdmin
+    const { data: conversationData, error: insertError } = await supabase
       .from("conversations")
       .insert({
         id: "00000000-0000-0000-0000-000000000001",
@@ -83,7 +83,7 @@ export async function addUserToGlobalChat(userId: string): Promise<void> {
     console.log(
       `Checking if user ${userId} is already a member of the global chat...`
     );
-    const { count, error: countError } = await supabaseAdmin
+    const { count, error: countError } = await supabase
       .from("conversation_members")
       .select("*", { count: "exact", head: true })
       .eq("conversation_id", globalChatId)
@@ -99,7 +99,7 @@ export async function addUserToGlobalChat(userId: string): Promise<void> {
       return;
     }
 
-    const { error } = await supabaseAdmin.from("conversation_members").insert({
+    const { error } = await supabase.from("conversation_members").insert({
       conversation_id: globalChatId,
       user_id: userId,
       role: "member",

@@ -2,7 +2,7 @@ import { supabase, supabaseAdmin } from "./db.ts";
 
 export async function getGlobalStats() {
   try {
-    const { data: membersData, error: membersError } = await supabaseAdmin
+    const { data: membersData, error: membersError } = await supabase
       .from("conversation_members")
       .select("user_id")
       .eq("conversation_id", "00000000-0000-0000-0000-000000000001");
@@ -13,7 +13,7 @@ export async function getGlobalStats() {
 
     const userIds = membersData?.map((member) => member.user_id) || [];
 
-    const { count: onlineCount, error: onlineError } = await supabaseAdmin
+    const { count: onlineCount, error: onlineError } = await supabase
       .from("users")
       .select("*", { count: "exact", head: true })
       .eq("status", "online")
@@ -23,7 +23,7 @@ export async function getGlobalStats() {
       throw new Error(`Error counting online users: ${onlineError.message}`);
     }
 
-    const { count: memberCount, error: memberCountError } = await supabaseAdmin
+    const { count: memberCount, error: memberCountError } = await supabase
       .from("conversation_members")
       .select("*", { count: "exact", head: true })
       .eq("conversation_id", "00000000-0000-0000-0000-000000000001");
@@ -34,11 +34,10 @@ export async function getGlobalStats() {
       );
     }
 
-    const { count: messageCount, error: messageCountError } =
-      await supabaseAdmin
-        .from("messages")
-        .select("*", { count: "exact", head: true })
-        .eq("conversation_id", "00000000-0000-0000-0000-000000000001");
+    const { count: messageCount, error: messageCountError } = await supabase
+      .from("messages")
+      .select("*", { count: "exact", head: true })
+      .eq("conversation_id", "00000000-0000-0000-0000-000000000001");
 
     if (messageCountError) {
       throw new Error(`Error counting messages: ${messageCountError.message}`);

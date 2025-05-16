@@ -11,7 +11,7 @@ export async function createUser(userData: UserRegistration): Promise<User> {
     if (authError) throw new Error(authError.message);
     if (!authData.user) throw new Error("Failed to create user");
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from("users")
       .insert({
         id: authData.user.id,
