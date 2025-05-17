@@ -100,14 +100,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/fp-ncc:${{ steps.version.outputs.VERSION }}
-
-            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
-            echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
-            echo "SUPABASE_JWT_SECRET=${{ secrets.SUPABASE_JWT_SECRET }}" >> .env
-            echo "PORT=8000" >> .env
-            echo "HOST=0.0.0.0" >> .env
-
             docker stop fp-ncc || echo "Gak ada yang bisa distop"
             docker rm fp-ncc || echo "Gak ada yang bisa dihapus"
-            docker run -d --name fp-ncc -p 8000:8000 ${{ secrets.DOCKERHUB_USERNAME }}/fp-ncc:${{ steps.version.outputs.VERSION }}
+            docker run -d --name fp-ncc -p 8000:8000  -e SUPABASE_URL="${{ secrets.SUPABASE_URL }}" -e SUPABASE_KEY="${{ secrets.SUPABASE_KEY }}" -e SUPABASE_JWT_SECRET="${{ secrets.SUPABASE_JWT_SECRET }}" -e PORT="${{ secrets.PORT_EXPOSE }}" -e HOST="${{ secrets.HOST_EXPOSE }}" ${{ secrets.DOCKERHUB_USERNAME }}/fp-ncc:${{ steps.version.outputs.VERSION }}
             docker image prune -f
