@@ -103,7 +103,7 @@ jobs:
             docker stop fp-ncc || echo "Gak ada yang bisa distop"
             docker rm fp-ncc || echo "Gak ada yang bisa dihapus"
             docker run -d --name fp-ncc \
-              -p 80:8000 \
+              -p ${{ secrets.PORT_EXPOSE }}:${{ secrets.PORT_EXPOSE }} \
               -e SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
               -e SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} \
               -e SUPABASE_SERVICE_KEY=${{ secrets.SUPABASE_SERVICE_KEY }} \
