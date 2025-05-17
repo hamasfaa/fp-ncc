@@ -1,5 +1,5 @@
 import { supabase, handleDbError } from "../utils/db.ts";
-import { Message, ReadReceipt } from "../temp/types/chat.ts";
+import { Message, ReadReceipt } from "../types/chat.type.ts";
 
 export async function sendMessage(
   conversationId: string,
