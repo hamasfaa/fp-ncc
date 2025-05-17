@@ -101,13 +101,11 @@ jobs:
           script: |
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/fp-ncc:${{ steps.version.outputs.VERSION }}
 
-            cat > .env <<EOF
-            SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-            SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
-            SUPABASE_JWT_SECRET=${{ secrets.SUPABASE_JWT_SECRET }}
-            PORT=8000
-            HOST=0.0.0.0
-            EOL
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+            echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
+            echo "SUPABASE_JWT_SECRET=${{ secrets.SUPABASE_JWT_SECRET }}" >> .env
+            echo "PORT=8000" >> .env
+            echo "HOST=0.0.0.0" >> .env
 
             docker stop fp-ncc || echo "Gak ada yang bisa distop"
             docker rm fp-ncc || echo "Gak ada yang bisa dihapus"
