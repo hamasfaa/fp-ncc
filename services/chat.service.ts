@@ -21,7 +21,10 @@ export async function startOrGetPersonalChat(
 ) {
   let conversation = await getPersonalConversation(userId, otherUserId);
 
-  if (!conversation) {
+  if (
+    !conversation ||
+    (Array.isArray(conversation) && conversation.length === 0)
+  ) {
     conversation = await createConversation(userId, "personal", undefined, [
       userId,
       otherUserId,
