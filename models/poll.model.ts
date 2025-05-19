@@ -64,17 +64,22 @@ export async function voteOnPoll(
 
       if (optionError) throw new Error(optionError.message);
 
-      await supabase
+      const { data: pollOptions, error: optionsError } = await supabase
+        .from("poll_options")
+        .select("id")
+        .eq("poll_id", option.poll_id);
+
+      if (optionsError) throw new Error(optionsError.message);
+
+      const optionIds = pollOptions.map((opt) => opt.id);
+
+      const { error: deleteError } = await supabase
         .from("poll_votes")
         .delete()
-        .in(
-          "poll_option_id",
-          supabase
-            .from("poll_options")
-            .select("id")
-            .eq("poll_id", option.poll_id)
-        )
+        .in("poll_option_id", optionIds)
         .eq("user_id", userId);
+
+      if (deleteError) throw new Error(deleteError.message);
     }
 
     const { error } = await supabase.from("poll_votes").insert({

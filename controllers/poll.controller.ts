@@ -62,7 +62,6 @@ export async function votePoll(ctx: Context) {
     const pollId = ctx.params.id;
     const body = await ctx.request.body.json();
 
-    console.log("Poll ID:", pollId);
     if (!body.option_id) {
       ctx.response.status = 400;
       ctx.response.body = { error: "Option ID is required" };
