@@ -58,7 +58,17 @@ export async function getConversationMessages(
         `
         *,
         sender:sender_id(id, username, avatar_url),
-        attachments(*)
+        attachments(*),
+        polls(
+          id,
+          question,
+          is_multiple_choice,
+          expires_at,
+          poll_options(
+            id,
+            option_text
+          )
+        )
       `
       )
       .eq("conversation_id", conversationId)
