@@ -252,3 +252,147 @@ export async function markMessageRead(ctx: Context) {
     ctx.response.body = { error: "Failed to mark message as read" };
   }
 }
+
+export async function leaveGroupChat(ctx: Context) {
+  try {
+    const userId = ctx.state.user.id;
+    const groupId = ctx.params.id;
+    const globalChatId = "00000000-0000-0000-0000-000000000001";
+
+    if (groupId === globalChatId) {
+      ctx.response.status = 400;
+      ctx.response.body = { error: "You cannot leave the global chat" };
+      return;
+    }
+
+    const { data: conversation, error: convError } = await supabase
+      .from("conversations")
+      .select("id, type")
+      .eq("id", groupId)
+      .eq("type", "group")
+      .single();
+
+    if (convError || !conversation) {
+      ctx.response.status = 404;
+      ctx.response.body = { error: "Group chat not found" };
+      return;
+    }
+
+    const { data: membership, error: memberError } = await supabase
+      .from("conversation_members")
+      .select("role")
+      .eq("conversation_id", groupId)
+      .eq("user_id", userId)
+      .single();
+
+    if (memberError) {
+      ctx.response.status = 400;
+      ctx.response.body = { error: "You are not a member of this group" };
+      return;
+    }
+
+    if (membership.role === "admin") {
+      const { error: deleteMembersError } = await supabase
+        .from("conversation_members")
+        .delete()
+        .eq("conversation_id", groupId);
+
+      if (deleteMembersError) throw new Error(deleteMembersError.message);
+
+      const { error: deleteMessagesError } = await supabase
+        .from("messages")
+        .delete()
+        .eq("conversation_id", groupId);
+
+      if (deleteMessagesError) throw new Error(deleteMessagesError.message);
+
+      try {
+        const { data: pollMessages } = await supabase
+          .from("messages")
+          .select("id")
+          .eq("conversation_id", groupId)
+          .eq("message_type", "poll");
+
+        if (pollMessages && pollMessages.length > 0) {
+          const messageIds = pollMessages.map((msg) => msg.id);
+
+          const { error: deleteVotesError } = await supabase
+            .from("poll_votes")
+            .delete()
+            .in(
+              "poll_option_id",
+              supabase
+                .from("poll_options")
+                .select("id")
+                .in(
+                  "poll_id",
+                  supabase
+                    .from("polls")
+                    .select("id")
+                    .in("message_id", messageIds)
+                )
+            );
+
+          if (deleteVotesError)
+            console.error("Error deleting poll votes:", deleteVotesError);
+
+          const { error: deleteOptionsError } = await supabase
+            .from("poll_options")
+            .delete()
+            .in(
+              "poll_id",
+              supabase.from("polls").select("id").in("message_id", messageIds)
+            );
+
+          if (deleteOptionsError)
+            console.error("Error deleting poll options:", deleteOptionsError);
+
+          const { error: deletePollsError } = await supabase
+            .from("polls")
+            .delete()
+            .in("message_id", messageIds);
+
+          if (deletePollsError)
+            console.error("Error deleting polls:", deletePollsError);
+        }
+      } catch (pollError) {
+        console.error("Error cleaning up polls:", pollError);
+      }
+
+      const { error: deleteConvError } = await supabase
+        .from("conversations")
+        .delete()
+        .eq("id", groupId);
+
+      if (deleteConvError) throw new Error(deleteConvError.message);
+
+      ctx.response.status = 200;
+      ctx.response.body = {
+        success: true,
+        message: "Group has been disbanded",
+        group_id: groupId,
+        disbanded: true,
+      };
+    } else {
+      const { error: leaveError } = await supabase
+        .from("conversation_members")
+        .delete()
+        .eq("conversation_id", groupId)
+        .eq("user_id", userId);
+
+      if (leaveError) throw new Error(leaveError.message);
+
+      ctx.response.status = 200;
+      ctx.response.body = {
+        success: true,
+        message: "Successfully left the group",
+        group_id: groupId,
+        disbanded: false,
+      };
+    }
+  } catch (error) {
+    console.error("Error leaving group chat:", error);
+    ctx.response.status = 500;
+    ctx.response.body = { error: "Failed to leave group" };
+  }
+}
