@@ -3,6 +3,7 @@ import { sendChatMessage, markAsRead } from "../services/chat.service.ts";
 import { MessageType } from "../types/ws.type.ts";
 import { supabase } from "../utils/db.ts";
 import { wsManager } from "../utils/wsManager.ts";
+import { submitPollVote } from "../services/poll.service.ts";
 
 export async function handleWebSocket(ctx: Context) {
   try {
@@ -42,6 +43,9 @@ export async function handleWebSocket(ctx: Context) {
             break;
           case MessageType.USER_STATUS:
             await handleStatusUpdate(connection.userId, message);
+            break;
+          case MessageType.POLL:
+            await handlePollMessage(connection.userId, message);
             break;
           default:
             console.warn("Unknown message type:", message.type);
@@ -104,4 +108,21 @@ async function handleStatusUpdate(userId: string, message: any) {
       last_seen: new Date().toISOString(),
     })
     .eq("id", userId);
+}
+async function handlePollMessage(userId: string, message: any) {
+  if (!message.data?.poll_id || !message.data?.option_id) {
+    return;
+  }
+
+  try {
+    await submitPollVote(
+      userId,
+      message.conversation_id,
+      message.data.poll_id,
+      message.data.option_id,
+      message.data.is_multiple_choice
+    );
+  } catch (error) {
+    console.error("Error handling poll vote:", error);
+  }
 }

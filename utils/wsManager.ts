@@ -116,20 +116,25 @@ class WebSocketManager {
   }
 
   async sendToUser(userId: string, message: WsMessage): Promise<void> {
-    let formattedMessage = {
-      type: message.type,
-      id: message.data.id,
-      conversation_id: message.data.conversation_id,
-      sender_id: message.data.sender_id,
-      message_type: message.data.message_type,
-      content: message.data.content,
-      is_edited: message.data.is_edited,
-      is_deleted: message.data.is_deleted,
-      created_at: message.data.created_at,
-      updated_at: message.data.updated_at,
-      timestamp: message.timestamp,
-      sender: message.sender,
-    };
+    let formattedMessage;
+    if (message.type === "text") {
+      formattedMessage = {
+        type: message.type,
+        id: message.data.id,
+        conversation_id: message.data.conversation_id,
+        sender_id: message.data.sender_id,
+        message_type: message.data.message_type,
+        content: message.data.content,
+        is_edited: message.data.is_edited,
+        is_deleted: message.data.is_deleted,
+        created_at: message.data.created_at,
+        updated_at: message.data.updated_at,
+        timestamp: message.timestamp,
+        sender: message.sender,
+      };
+    } else if (message.type === "poll") {
+      formattedMessage = message;
+    }
 
     const userConns = this.userConnections.get(userId);
     if (userConns) {
@@ -148,7 +153,6 @@ class WebSocketManager {
   ): Promise<void> {
     try {
       console.log(`Broadcasting message to conversation ${conversationId}`);
-
       const { data: sender, error: senderError } = await supabase
         .from("users")
         .select("id, username, avatar_url")
