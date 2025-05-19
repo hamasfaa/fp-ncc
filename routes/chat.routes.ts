@@ -12,6 +12,7 @@ router
   .get("/chats/:id/messages", chatController.getMessages)
   .post("/chats/personal", chatController.createOrGetPersonalChat)
   .post("/chats/group", chatController.createNewGroupChat)
+  .get("/chats/groups", chatController.getAllGroupChats)
   .post("/chats/:id/members", chatController.addUserToGroup)
   .post("/chats/:id/messages", chatController.sendMessage)
   .post("/messages/:id/read", chatController.markMessageRead)

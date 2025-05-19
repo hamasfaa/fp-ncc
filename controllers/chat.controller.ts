@@ -81,6 +81,57 @@ export async function getGlobalChat(ctx: Context) {
   }
 }
 
+export async function getAllGroupChats(ctx: Context) {
+  try {
+    const userId = ctx.state.user.id;
+    const globalChatId = "00000000-0000-0000-0000-000000000001"; // Your global chat ID
+
+    // Get all group chats except global chat
+    const { data: groups, error } = await supabase
+      .from("conversations")
+      .select(
+        `
+        id,
+        name,
+        created_at,
+        created_by,
+        creator:created_by(username),
+        member_count:conversation_members(count)
+      `
+      )
+      .eq("type", "group")
+      .neq("id", globalChatId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw new Error(error.message);
+
+    const enhancedGroups = await Promise.all(
+      groups.map(async (group) => {
+        const { count, error: memberError } = await supabase
+          .from("conversation_members")
+          .select("*", { count: "exact", head: true })
+          .eq("conversation_id", group.id)
+          .eq("user_id", userId);
+
+        if (memberError) throw new Error(memberError.message);
+
+        return {
+          ...group,
+          is_member: count ? count > 0 : false,
+          member_count: group.member_count[0]?.count || 0,
+        };
+      })
+    );
+
+    ctx.response.status = 200;
+    ctx.response.body = { groups: enhancedGroups };
+  } catch (error) {
+    console.error("Error fetching group chats:", error);
+    ctx.response.status = 500;
+    ctx.response.body = { error: "Failed to fetch group chats" };
+  }
+}
+
 export async function getGlobalChatStats(ctx: Context) {
   try {
     const stats = await getGlobalStats();
