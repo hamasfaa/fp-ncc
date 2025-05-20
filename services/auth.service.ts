@@ -24,16 +24,16 @@ export async function registerUser(
     await addUserToGlobalChat(user.id);
     await sendGlobalChatWelcomeMessage(user.username);
 
-    const { data: authData, error } = await supabase.auth.signInWithPassword({
-      email: userData.email,
-      password: userData.password,
-    });
+    // const { data: authData, error } = await supabase.auth.signInWithPassword({
+    //   email: userData.email,
+    //   password: userData.password,
+    // });
 
-    if (error) throw new Error(error.message);
+    // if (error) throw new Error(error.message);
 
     return {
       user,
-      token: authData.session?.access_token || null,
+      token: null,
     };
   } catch (error) {
     console.error("Registration error:", error);
