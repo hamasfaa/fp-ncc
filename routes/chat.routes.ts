@@ -15,6 +15,7 @@ router
   .get("/chats/groups", chatController.getAllGroupChats)
   .post("/chats/:id/leave", chatController.leaveGroupChat)
   .post("/chats/:id/members", chatController.addUserToGroup)
+  .post("/chats/join", chatController.joinGroupChat)
   .post("/chats/:id/messages", chatController.sendMessage)
   .post("/messages/:id/read", chatController.markMessageRead)
   .get("/chats/global", chatController.getGlobalChat)

@@ -396,3 +396,96 @@ export async function leaveGroupChat(ctx: Context) {
     ctx.response.body = { error: "Failed to leave group" };
   }
 }
+
+export async function joinGroupChat(ctx: Context) {
+  try {
+    const userId = ctx.state.user.id;
+    const body = await ctx.request.body.json();
+
+    if (
+      !body.name ||
+      typeof body.name !== "string" ||
+      body.name.trim() === ""
+    ) {
+      ctx.response.status = 400;
+      ctx.response.body = { error: "Group name is required" };
+      return;
+    }
+
+    const groupName = body.name.trim();
+
+    const { data: groups, error: findError } = await supabase
+      .from("conversations")
+      .select("id, name, type")
+      .eq("type", "group")
+      .ilike("name", groupName);
+
+    if (findError) throw new Error(findError.message);
+
+    if (!groups || groups.length === 0) {
+      ctx.response.status = 404;
+      ctx.response.body = { error: `No group found with name '${groupName}'` };
+      return;
+    }
+
+    let targetGroup = groups[0];
+    if (groups.length > 1) {
+      const exactMatch = groups.find(
+        (g) => g.name.toLowerCase() === groupName.toLowerCase()
+      );
+      if (exactMatch) {
+        targetGroup = exactMatch;
+      }
+    }
+
+    const { count, error: countError } = await supabase
+      .from("conversation_members")
+      .select("*", { count: "exact", head: true })
+      .eq("conversation_id", targetGroup.id)
+      .eq("user_id", userId);
+
+    if (countError) throw new Error(countError.message);
+
+    if (count && count > 0) {
+      ctx.response.status = 400;
+      ctx.response.body = {
+        error: "You are already a member of this group",
+        group: targetGroup,
+      };
+      return;
+    }
+
+    const { error: joinError } = await supabase
+      .from("conversation_members")
+      .insert({
+        conversation_id: targetGroup.id,
+        user_id: userId,
+        role: "member",
+      });
+
+    if (joinError) throw new Error(joinError.message);
+
+    const { data: userData } = await supabase
+      .from("users")
+      .select("username")
+      .eq("id", userId)
+      .single();
+
+    console.log(
+      `User ${userData?.username} (${userId}) joined group ${
+        targetGroup.name
+      } (${targetGroup.id}) at ${new Date().toISOString()}`
+    );
+
+    ctx.response.status = 200;
+    ctx.response.body = {
+      success: true,
+      message: `Successfully joined group '${targetGroup.name}'`,
+      group: targetGroup,
+    };
+  } catch (error) {
+    console.error("Error joining group by name:", error);
+    ctx.response.status = 500;
+    ctx.response.body = { error: "Failed to join group" };
+  }
+}
